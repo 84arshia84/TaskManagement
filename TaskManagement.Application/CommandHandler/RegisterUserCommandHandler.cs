@@ -15,7 +15,8 @@ namespace TaskManagement.Application.CommandHandler
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
-        public RegisterUserCommandHandler(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole<Guid>> roleManager)
+        public RegisterUserCommandHandler(UserManager<ApplicationUser> userManager,
+            RoleManager<IdentityRole<Guid>> roleManager)
         {
             _userManager = userManager;
             _roleManager = roleManager;
@@ -23,7 +24,17 @@ namespace TaskManagement.Application.CommandHandler
 
         public async Task<RegisterUserResult> Handle(RegisterUserCommand request, CancellationToken cancellationToken)
         {
-            // چک وجود نقش و ایجاد در صورت نبود
+            var allowedRoles = new[] { "Admin", "User" };
+
+            if (!allowedRoles.Contains(request.Role))
+            {
+                return new RegisterUserResult
+                {
+                    Success = false,
+                    Errors = new[] { "نقش نامعتبر است. فقط 'Admin' یا 'User' مجاز هستند." }
+                };
+            }
+
             if (!await _roleManager.RoleExistsAsync(request.Role))
             {
                 await _roleManager.CreateAsync(new IdentityRole<Guid>(request.Role));
