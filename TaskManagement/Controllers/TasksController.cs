@@ -39,7 +39,7 @@ namespace TaskManagement.Host.Controllers
         public async Task<IActionResult> GetTasks([FromQuery] TaskManagement.Domain.TaskStatus? status)
         {
 
-            var query = new GetAllTasksQuery();
+            var query = new GetAllTasksCommand();
             query.Status = status;
             var tasks = await _mediator.Send(query);
             return Ok(tasks);
@@ -52,7 +52,7 @@ namespace TaskManagement.Host.Controllers
         {
             var userId = Guid.Parse(User.FindFirst("UserId")?.Value);
 
-            var tasks = await _mediator.Send(new GetTasksByUserIdQuery(userId));
+            var tasks = await _mediator.Send(new GetTasksByUserIdCommand(userId));
             if (tasks == null || !tasks.Any())
             {
                 return NotFound("No tasks found for this user.");
@@ -64,7 +64,7 @@ namespace TaskManagement.Host.Controllers
         [Authorize]
         public async Task<IActionResult> GetTasksByStatus([FromQuery] TaskManagement.Domain.TaskStatus status)
         {
-            var result = await _mediator.Send(new GetTasksByStatusQuery { Status = status });
+            var result = await _mediator.Send(new GetTasksByStatusCommand { Status = status });
             return Ok(result);
         }
 

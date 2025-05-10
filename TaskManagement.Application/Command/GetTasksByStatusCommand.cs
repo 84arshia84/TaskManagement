@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TaskManagement.Application.Command
 {
-    public class GetTasksByStatusQuery : IRequest<List<TaskDto>>
+    public class GetTasksByStatusCommand : IRequest<List<TaskDto>>
     {
         public TaskManagement.Domain.TaskStatus Status { get; set; }
     }

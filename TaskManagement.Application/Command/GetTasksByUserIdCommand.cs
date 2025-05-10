@@ -5,11 +5,11 @@ using TaskManagement.Domain;
 
 namespace TaskManagement.Application.Command
 {
-    public class GetTasksByUserIdQuery : IRequest<List<TaskItem>>
+    public class GetTasksByUserIdCommand : IRequest<List<TaskItem>>
     {
         public Guid UserId { get; }
 
-        public GetTasksByUserIdQuery(Guid userId)
+        public GetTasksByUserIdCommand(Guid userId)
         {
             UserId = userId;
         }

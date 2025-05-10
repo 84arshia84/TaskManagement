@@ -8,18 +8,18 @@ using TaskStatus = TaskManagement.Domain.TaskStatus;
 
 namespace TaskManagement.Application.Queries.GetTasksByUserId
 {
-    public class GetTasksByUserIdQueryHandler : IRequestHandler<GetAllTasksQuery, List<TaskItem>>
+    public class GetAllTasksCommandHandler : IRequestHandler<GetAllTasksCommand, List<TaskItem>>
     {
         private readonly DatabaseContext _context;
 
-        public GetTasksByUserIdQueryHandler(DatabaseContext context)
+        public GetAllTasksCommandHandler(DatabaseContext context)
         {
             _context = context;
         }
 
 
 
-        public async Task<List<TaskItem>> Handle(GetAllTasksQuery request, CancellationToken cancellationToken)
+        public async Task<List<TaskItem>> Handle(GetAllTasksCommand request, CancellationToken cancellationToken)
         {
             var AllTask = await _context.Tasks.ToListAsync();
             if (request.Status== TaskStatus.Pending)

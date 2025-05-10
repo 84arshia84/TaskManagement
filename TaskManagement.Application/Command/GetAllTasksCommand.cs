@@ -5,7 +5,7 @@ using TaskManagement.Domain;
 
 namespace TaskManagement.Application.Queries.GetAllTasks
 {
-    public class GetAllTasksQuery : IRequest<List<TaskItem>>
+    public class GetAllTasksCommand : IRequest<List<TaskItem>>
     {
         public TaskManagement.Domain.TaskStatus? Status { get; set; }
 
