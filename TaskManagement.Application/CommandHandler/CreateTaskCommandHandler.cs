@@ -1,32 +1,25 @@
 ﻿using MediatR;
+using TaskManagement.Application.Commands.CreateTask;
 using TaskManagement.Domain;
-using TaskManagement.Persistence;
+using TaskManagement.Domain.IRepositories;
 
-namespace TaskManagement.Application.Commands.CreateTask
+namespace TaskManagement.Application.CommandHandler
 {
     public class CreateTaskCommandHandler : IRequestHandler<CreateTaskCommand, Guid>
     {
-        private readonly DatabaseContext _context;
 
-        public CreateTaskCommandHandler(DatabaseContext context)
+        private readonly ITaskItemRepository _taskItemRepository;
+
+        public CreateTaskCommandHandler(ITaskItemRepository taskItemRepository)
         {
-            _context = context;
+            _taskItemRepository = taskItemRepository;
         }
+
 
         public async Task<Guid> Handle(CreateTaskCommand request, CancellationToken cancellationToken)
         {
-            var task = new TaskItem
-            {
-                Id = Guid.NewGuid(),
-                Title = request.Title,
-                Description = request.Description,
-                Status = request.Status,
-                AssignedUserId = request.AssignedUserId
-            };
-
-            _context.Tasks.Add(task);
-            await _context.SaveChangesAsync(cancellationToken);
-
+            var task = new TaskItem(request.Title, request.Description, request.AssignedUserId, request.Status);
+            await _taskItemRepository.CreateAsync(task);
             return task.Id;
         }
     }

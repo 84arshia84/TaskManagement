@@ -1,16 +1,11 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TaskManagement.Application.Command;
 using TaskManagement.Application.Commands.CreateTask;
 using TaskManagement.Application.Commands.DeleteTask;
 using TaskManagement.Application.Commands.UpdateTask;
 using TaskManagement.Application.Queries.GetAllTasks;
-using TaskManagement.Application.Queries.GetTasksByUserId;
-using TaskManagement.Application.Queries.GetTasksByUserId;
-using TaskManagement.Domain;
-using TaskManagement.Domain;
 
 namespace TaskManagement.Host.Controllers
 {
@@ -84,7 +79,7 @@ namespace TaskManagement.Host.Controllers
 
 
 
-        [HttpPut()]
+        [HttpPut]
         [Authorize(Roles = "User")]
         public async Task<IActionResult> UpdateUserTask([FromBody] UpdateUserTaskCommand command)
         {

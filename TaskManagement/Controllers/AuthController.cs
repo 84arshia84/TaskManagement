@@ -1,6 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using MediatR;
+﻿using MediatR;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -8,9 +7,6 @@ using System.Security.Claims;
 using System.Text;
 using TaskManagement.Application.Command;
 using TaskManagement.Domain;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Configuration;
-//using TaskManagement.Infrastructure;
 
 namespace TaskManagement.Host.Controllers
 {
@@ -20,33 +16,27 @@ namespace TaskManagement.Host.Controllers
     {
         private readonly IMediator _mediator;
         private readonly IConfiguration _configuration;
-
         private readonly UserManager<ApplicationUser> _userManager;
 
-        //private readonly JwtSettings _jwtSettings;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-
-        public AuthController(IMediator mediator, UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
+        public AuthController(IMediator mediator, UserManager<ApplicationUser> userManager, IConfiguration configuration)
         {
             _mediator = mediator;
             _userManager = userManager;
-            _signInManager = signInManager;
             _configuration = configuration;
-            //_jwtSettings = jwtSettings;
         }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterUserCommand command)
         {
             var result = await _mediator.Send(command);
-            if (!result.Success)
-                return BadRequest(result.Errors);
-
-            return Ok("User registered successfully");
+            return result.Success ? 
+                Ok("User registered successfully") :
+                BadRequest(result.Errors);
         }
+
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto command)
+        public async Task<IActionResult> Login([FromBody] LoginCommand command)
+
         {
             var user = await _userManager.FindByNameAsync(command.UserName);
             if (user == null || !await _userManager.CheckPasswordAsync(user, command.Password))
@@ -60,7 +50,7 @@ namespace TaskManagement.Host.Controllers
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim("UserId",user.Id.ToString()) 
+                new Claim("UserId",user.Id.ToString())
             };
 
             authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
@@ -80,13 +70,6 @@ namespace TaskManagement.Host.Controllers
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expiration = token.ValidTo
             });
-        }
-
-
-        public class LoginDto
-        {
-            public string UserName { get; set; } = "";
-            public string Password { get; set; } = "";
         }
     }
 }

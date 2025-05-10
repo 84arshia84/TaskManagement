@@ -10,11 +10,11 @@ using TaskManagement.Persistence;
 
 namespace TaskManagement.Application.CommandHandler
 {
-    public class GetTasksByStatuscommandHandler : IRequestHandler<GetTasksByStatusCommand, List<TaskDto>>
+    public class GetTasksByStatusCommandHandler : IRequestHandler<GetTasksByStatusCommand, List<TaskDto>>
     {
         private readonly DatabaseContext _context;
 
-        public GetTasksByStatuscommandHandler(DatabaseContext context)
+        public GetTasksByStatusCommandHandler(DatabaseContext context)
         {
             _context = context;
         }

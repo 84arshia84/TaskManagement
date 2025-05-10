@@ -1,15 +1,10 @@
 ﻿using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TaskManagement.Application.Command
 {
     public class GetTasksByStatusCommand : IRequest<List<TaskDto>>
     {
-        public TaskManagement.Domain.TaskStatus Status { get; set; }
+        public Domain.TaskStatus Status { get; set; }
     }
 
     public class TaskDto

@@ -1,15 +1,14 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Text;
+using System.Reflection;
 using TaskManagement.Application.CommandHandler;
 using TaskManagement.Domain;
+using TaskManagement.Domain.IRepositories;
+using TaskManagement.Host.Configurations;
+using TaskManagement.Infrastructure.Repositories;
 using TaskManagement.Persistence;
-using MediatR;
-using TaskManagement.Application.Queries.GetAllTasks;
-using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
@@ -21,7 +20,7 @@ builder.Services.AddMediatR(Assembly.GetExecutingAssembly());
 var configuration = builder.Configuration;
 
 
-
+builder.Services.AddScoped<ITaskItemRepository,TaskItemRepository>();
 
 // 2. DbContext
 builder.Services.AddDbContext<DatabaseContext>(options =>
@@ -31,30 +30,8 @@ builder.Services.AddDbContext<DatabaseContext>(options =>
 builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<DatabaseContext>()
     .AddDefaultTokenProviders();
-// 1. Load JwtSettings from appsettings.json
-// JWT Authentication Config
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = jwtSettings["Issuer"],
-            ValidAudience = jwtSettings["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(key)
-        };
-    });
-
+builder.Services.AddJwt(builder.Configuration);
 
 // 5. Authorization
 builder.Services.AddAuthorization(options =>

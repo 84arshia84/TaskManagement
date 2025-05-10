@@ -20,10 +20,7 @@ namespace TaskManagement.Application.Commands.UpdateTask
             if (task == null)
                 return false;
 
-            task.Title = request.Title;
-            task.Description = request.Description;
-            task.Status = request.Status;
-            task.AssignedUserId = request.AssignedUserId;
+            task.UpdateTask(request.Title, request.Description, request.AssignedUserId, request.Status);
 
             await _context.SaveChangesAsync(cancellationToken);
             return true;
