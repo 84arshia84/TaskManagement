@@ -1,25 +1,25 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using TaskManagement.Application.Command;
 using TaskManagement.Domain;
 using TaskManagement.Persistence;
 
-namespace TaskManagement.Application.Queries.GetTaskById
+namespace TaskManagement.Application.CommandHandler
 {
-    public class GetTaskByIdQueryHandler : IRequestHandler<GetTaskByIdQuery, TaskItem?>
+    public class GetTasksByUserIdQueryHandler : IRequestHandler<GetTasksByUserIdQuery, List<TaskItem>>
     {
         private readonly DatabaseContext _context;
 
-        public GetTaskByIdQueryHandler(DatabaseContext context)
+        public GetTasksByUserIdQueryHandler(DatabaseContext context)
         {
             _context = context;
         }
 
-        public async Task<TaskItem?> Handle(GetTaskByIdQuery request, CancellationToken cancellationToken)
+        public async Task<List<TaskItem>> Handle(GetTasksByUserIdQuery request, CancellationToken cancellationToken)
         {
-            // استفاده از SingleOrDefaultAsync برای جستجوی دقیق تسک با id خاص
             return await _context.Tasks
-                .Include(t => t.AssignedUser)
-                .SingleOrDefaultAsync(t => t.Id == request.Id, cancellationToken);
+                .Where(t => t.AssignedUserId == request.UserId)
+                .ToListAsync(cancellationToken);
         }
     }
 }

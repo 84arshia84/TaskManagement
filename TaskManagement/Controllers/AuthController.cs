@@ -9,7 +9,8 @@ using System.Text;
 using TaskManagement.Application.Command;
 using TaskManagement.Domain;
 using Microsoft.AspNetCore.Identity;
-using TaskManagement.Infrastructure;
+using Microsoft.Extensions.Configuration;
+//using TaskManagement.Infrastructure;
 
 namespace TaskManagement.Host.Controllers
 {
@@ -18,16 +19,21 @@ namespace TaskManagement.Host.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly IConfiguration _configuration;
+
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly JwtSettings _jwtSettings;
+
+        //private readonly JwtSettings _jwtSettings;
         private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AuthController(IMediator mediator, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, JwtSettings jwtSettings)
+        public AuthController(IMediator mediator, UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager, IConfiguration configuration)
         {
             _mediator = mediator;
             _userManager = userManager;
             _signInManager = signInManager;
-            _jwtSettings = jwtSettings;
+            _configuration = configuration;
+            //_jwtSettings = jwtSettings;
         }
 
         [HttpPost("register")]
@@ -39,51 +45,48 @@ namespace TaskManagement.Host.Controllers
 
             return Ok("User registered successfully");
         }
-
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginDto dto)
+        public async Task<IActionResult> Login([FromBody] LoginDto command)
         {
-            var user = await _userManager.FindByNameAsync(dto.UserName);
-            if (user == null) return Unauthorized("Invalid credentials");
-
-            var result = await _signInManager.CheckPasswordSignInAsync(user, dto.Password, false);
-            if (!result.Succeeded) return Unauthorized("Invalid credentials");
-
-            var roles = await _userManager.GetRolesAsync(user);
-            var token = GenerateJwtToken(user, roles);
-
-            return Ok(new { token });
-        }
-
-        private string GenerateJwtToken(ApplicationUser user, IList<string> roles)
-        {
-            var claims = new List<Claim>
+            var user = await _userManager.FindByNameAsync(command.UserName);
+            if (user == null || !await _userManager.CheckPasswordAsync(user, command.Password))
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+                return Unauthorized("Invalid username or password.");
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var authClaims = new List<Claim>
+            {
                 new Claim(ClaimTypes.Name, user.UserName),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim("UserId",user.Id.ToString()) 
             };
 
-            foreach (var role in roles)
-                claims.Add(new Claim(ClaimTypes.Role, role));
+            authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
+            var jwtSettings = _configuration.GetSection("JwtSettings");
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
             var token = new JwtSecurityToken(
-                issuer: _jwtSettings.Issuer,
-                audience: _jwtSettings.Audience,
-                claims: claims,
-                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpireMinutes),
-                signingCredentials: creds);
+                issuer: jwtSettings["Issuer"],
+                audience: jwtSettings["Audience"],
+                expires: DateTime.Now.AddHours(1),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(key, SecurityAlgorithms.HmacSha256)
+            );
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = token.ValidTo
+            });
         }
-    }
 
-    public class LoginDto
-    {
-        public string UserName { get; set; } = "";
-        public string Password { get; set; } = "";
+
+        public class LoginDto
+        {
+            public string UserName { get; set; } = "";
+            public string Password { get; set; } = "";
+        }
     }
 }

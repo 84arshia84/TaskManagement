@@ -229,6 +229,9 @@ namespace TaskManagement.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ApplicationUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("AssignedUserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -245,7 +248,7 @@ namespace TaskManagement.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedUserId");
+                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Tasks");
                 });
@@ -303,13 +306,9 @@ namespace TaskManagement.Persistence.Migrations
 
             modelBuilder.Entity("TaskManagement.Domain.TaskItem", b =>
                 {
-                    b.HasOne("TaskManagement.Domain.ApplicationUser", "AssignedUser")
+                    b.HasOne("TaskManagement.Domain.ApplicationUser", null)
                         .WithMany("Tasks")
-                        .HasForeignKey("AssignedUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AssignedUser");
+                        .HasForeignKey("ApplicationUserId");
                 });
 
             modelBuilder.Entity("TaskManagement.Domain.ApplicationUser", b =>

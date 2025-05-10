@@ -13,7 +13,6 @@ namespace TaskManagement.Domain
         public string Description { get; set; } = string.Empty;
         public TaskStatus Status { get; set; } = TaskStatus.Pending;
         public Guid AssignedUserId { get; set; }
-        public ApplicationUser? AssignedUser { get; set; }
 
 
 

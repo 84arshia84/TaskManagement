@@ -9,9 +9,5 @@ namespace TaskManagement.Application.Queries.GetAllTasks
     {
         public TaskManagement.Domain.TaskStatus? Status { get; set; }
 
-        public GetAllTasksQuery(TaskManagement.Domain.TaskStatus? status = null)
-        {
-            Status = status;
-        }
     }
 }

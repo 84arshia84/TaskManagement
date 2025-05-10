@@ -12,8 +12,8 @@ using TaskManagement.Persistence;
 namespace TaskManagement.Persistence.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20250509231627_Init")]
-    partial class Init
+    [Migration("20250510093134_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -232,6 +232,9 @@ namespace TaskManagement.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("ApplicationUserId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("AssignedUserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -248,7 +251,7 @@ namespace TaskManagement.Persistence.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedUserId");
+                    b.HasIndex("ApplicationUserId");
 
                     b.ToTable("Tasks");
                 });
@@ -306,13 +309,9 @@ namespace TaskManagement.Persistence.Migrations
 
             modelBuilder.Entity("TaskManagement.Domain.TaskItem", b =>
                 {
-                    b.HasOne("TaskManagement.Domain.ApplicationUser", "AssignedUser")
+                    b.HasOne("TaskManagement.Domain.ApplicationUser", null)
                         .WithMany("Tasks")
-                        .HasForeignKey("AssignedUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AssignedUser");
+                        .HasForeignKey("ApplicationUserId");
                 });
 
             modelBuilder.Entity("TaskManagement.Domain.ApplicationUser", b =>
