@@ -8,18 +8,16 @@ namespace TaskManagement.Application.CommandHandler
 {
     public class GetTasksByUserIdCommandHandler : IRequestHandler<GetTasksByUserIdCommand, List<TaskItem>>
     {
-        private readonly DatabaseContext _context;
+        private readonly ITaskItemRepository _taskItemRepository;
 
-        public GetTasksByUserIdCommandHandler(DatabaseContext context)
+        public GetTasksByUserIdCommandHandler(ITaskItemRepository taskItemRepository)
         {
-            _context = context;
+            _taskItemRepository = taskItemRepository;
         }
 
         public async Task<List<TaskItem>> Handle(GetTasksByUserIdCommand request, CancellationToken cancellationToken)
         {
-            return await _context.Tasks
-                .Where(t => t.AssignedUserId == request.UserId)
-                .ToListAsync(cancellationToken);
+            return await _taskItemRepository.GetByUserIdAsync(request.UserId);
         }
     }
 }

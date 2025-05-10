@@ -5,23 +5,20 @@ namespace TaskManagement.Application.Commands.DeleteTask
 {
     public class DeleteTaskCommandHandler : IRequestHandler<DeleteTaskCommand, Unit>
     {
-        private readonly DatabaseContext _context;
+        private readonly ITaskItemRepository _taskItemRepository;
 
-        public DeleteTaskCommandHandler(DatabaseContext context)
+        public DeleteTaskCommandHandler(ITaskItemRepository taskItemRepository)
         {
-            _context = context;
+            _taskItemRepository = taskItemRepository;
         }
 
         public async Task<Unit> Handle(DeleteTaskCommand request, CancellationToken cancellationToken)
         {
-            var task = await _context.Tasks.FindAsync(request.Id);
-            if (task == null)
+            var result = await _taskItemRepository.DeleteAsync(request.Id);
+            if (!result)
             {
                 throw new KeyNotFoundException("Task not found");
             }
-
-            _context.Tasks.Remove(task);
-            await _context.SaveChangesAsync(cancellationToken);
 
             return Unit.Value;
         }

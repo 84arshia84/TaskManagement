@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using TaskManagement.Application.Commands.CreateTask;
 using TaskManagement.Domain;
-using TaskManagement.Domain.IRepositories;
 
 namespace TaskManagement.Application.CommandHandler
 {

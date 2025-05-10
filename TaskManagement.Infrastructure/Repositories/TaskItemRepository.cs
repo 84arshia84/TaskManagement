@@ -1,6 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using TaskManagement.Domain;
-using TaskManagement.Domain.IRepositories;
 using TaskManagement.Persistence;
 
 namespace TaskManagement.Infrastructure.Repositories
@@ -22,24 +21,55 @@ namespace TaskManagement.Infrastructure.Repositories
 
         public async Task<List<TaskItem>> GetAllAsync()
         {
-            var result = await _context.Tasks.ToListAsync();
-            return result;
+            return await _context.Tasks.ToListAsync();
         }
 
         public async Task<TaskItem?> GetByIdAsync(Guid id)
         {
-            var result = await _context.Tasks.FirstOrDefaultAsync(item => item.Id == id);
-            return result;
+            return await _context.Tasks.FirstOrDefaultAsync(item => item.Id == id);
         }
 
         public async Task<List<TaskItem>> GetByStatusAsync(int? status)
         {
-            var result = await _context.Tasks
-                .Where(item => 
-                    (status == null) ||
-                    (status != null && (int)item.Status == status))
+            return await _context.Tasks
+                .Where(item =>
+                    status == null || (int)item.Status == status)
                 .ToListAsync();
-            return result;
+        }
+
+        public async Task<List<TaskItem>> GetByUserIdAsync(Guid userId)
+        {
+            return await _context.Tasks
+                .Where(item => item.AssignedUserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<bool> UpdateAsync(TaskItem taskItem)
+        {
+            var existingTask = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == taskItem.Id);
+            if (existingTask == null)
+                return false;
+
+            existingTask.UpdateTask(
+                taskItem.Title,
+                taskItem.Description,
+                taskItem.AssignedUserId,
+                taskItem.Status
+            );
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteAsync(Guid id)
+        {
+            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id);
+            if (task == null)
+                return false;
+
+            _context.Tasks.Remove(task);
+            await _context.SaveChangesAsync();
+            return true;
         }
     }
 }

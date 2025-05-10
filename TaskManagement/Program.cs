@@ -5,7 +5,6 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using TaskManagement.Application.CommandHandler;
 using TaskManagement.Domain;
-using TaskManagement.Domain.IRepositories;
 using TaskManagement.Host.Configurations;
 using TaskManagement.Infrastructure.Repositories;
 using TaskManagement.Persistence;

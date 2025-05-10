@@ -7,23 +7,27 @@ namespace TaskManagement.Application.Commands.UpdateTask
 {
     public class UpdateTaskCommandHandler : IRequestHandler<UpdateTaskCommand, bool>
     {
-        private readonly DatabaseContext _context;
+        private readonly ITaskItemRepository _taskItemRepository;
 
-        public UpdateTaskCommandHandler(DatabaseContext context)
+        public UpdateTaskCommandHandler(ITaskItemRepository taskItemRepository)
         {
-            _context = context;
+            _taskItemRepository = taskItemRepository;
         }
 
         public async Task<bool> Handle(UpdateTaskCommand request, CancellationToken cancellationToken)
         {
-            var task = await _context.Tasks.FindAsync(new object[] { request.Id }, cancellationToken);
-            if (task == null)
+            var existingTask = await _taskItemRepository.GetByIdAsync(request.Id);
+            if (existingTask == null)
                 return false;
 
-            task.UpdateTask(request.Title, request.Description, request.AssignedUserId, request.Status);
+            existingTask.UpdateTask(
+                title: request.Title,
+                description: request.Description,
+                assignedUserId: request.AssignedUserId,
+                status: request.Status
+            );
 
-            await _context.SaveChangesAsync(cancellationToken);
-            return true;
+            return await _taskItemRepository.UpdateAsync(existingTask);
         }
     }
 }

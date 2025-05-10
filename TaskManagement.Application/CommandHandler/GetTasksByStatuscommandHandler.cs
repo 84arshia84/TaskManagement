@@ -12,25 +12,23 @@ namespace TaskManagement.Application.CommandHandler
 {
     public class GetTasksByStatusCommandHandler : IRequestHandler<GetTasksByStatusCommand, List<TaskDto>>
     {
-        private readonly DatabaseContext _context;
+        private readonly ITaskItemRepository _taskItemRepository;
 
-        public GetTasksByStatusCommandHandler(DatabaseContext context)
+        public GetTasksByStatusCommandHandler(ITaskItemRepository taskItemRepository)
         {
-            _context = context;
+            _taskItemRepository = taskItemRepository;
         }
-
         public async Task<List<TaskDto>> Handle(GetTasksByStatusCommand request, CancellationToken cancellationToken)
         {
-            return await _context.Tasks
-                .Where(t => t.Status == request.Status)
-                .Select(t => new TaskDto
-                {
-                    Id = t.Id,
-                    Title = t.Title,
-                    Description = t.Description,
-                    Status = t.Status
-                })
-                .ToListAsync(cancellationToken);
+            var tasks = await _taskItemRepository.GetByStatusAsync((int?)request.Status);
+
+            return tasks.Select(t => new TaskDto
+            {
+                Id = t.Id,
+                Title = t.Title,
+                Description = t.Description,
+                Status = t.Status
+            }).ToList();
         }
     }
 }
