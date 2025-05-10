@@ -17,14 +17,7 @@ namespace TaskManagement.Domain
 
 
 
-        public TaskItem(string title, string description, TaskStatus status, Guid assignedUserId)
-        {
-            Id = Guid.NewGuid();
-            Title = title;
-            Description = description;
-            Status = status;
-            AssignedUserId = assignedUserId;
-        }
+       
     }
 
 }
