@@ -8,5 +8,5 @@ public interface ITaskItemRepository
     Task<List<TaskItem>> GetByStatusAsync(int? status);
     Task<List<TaskItem>> GetByUserIdAsync(Guid userId);
     Task<bool> UpdateAsync(TaskItem taskItem);
-    Task<bool> DeleteAsync(Guid id);
+    Task<bool> DeleteAsync(TaskItem item);
 }

@@ -14,11 +14,9 @@ namespace TaskManagement.Application.Commands.DeleteTask
 
         public async Task<Unit> Handle(DeleteTaskCommand request, CancellationToken cancellationToken)
         {
-            var result = await _taskItemRepository.DeleteAsync(request.Id);
-            if (!result)
-            {
-                throw new KeyNotFoundException("Task not found");
-            }
+            var task = await _taskItemRepository.GetByIdAsync(request.Id);
+         
+            var result = await _taskItemRepository.DeleteAsync(task);
 
             return Unit.Value;
         }

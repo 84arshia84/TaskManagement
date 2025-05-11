@@ -46,26 +46,14 @@ namespace TaskManagement.Infrastructure.Repositories
 
         public async Task<bool> UpdateAsync(TaskItem taskItem)
         {
-            var existingTask = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == taskItem.Id);
-            if (existingTask == null)
-                return false;
-
-            existingTask.UpdateTask(
-                taskItem.Title,
-                taskItem.Description,
-                taskItem.AssignedUserId,
-                taskItem.Status
-            );
-
+           
+            _context.Tasks.Update(taskItem);
             await _context.SaveChangesAsync();
             return true;
         }
 
-        public async Task<bool> DeleteAsync(Guid id)
+        public async Task<bool> DeleteAsync(TaskItem task)
         {
-            var task = await _context.Tasks.FirstOrDefaultAsync(t => t.Id == id);
-            if (task == null)
-                return false;
 
             _context.Tasks.Remove(task);
             await _context.SaveChangesAsync();
