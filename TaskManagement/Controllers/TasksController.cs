@@ -20,7 +20,6 @@ namespace TaskManagement.Host.Controllers
             _mediator = mediator;
         }
 
-        // ایجاد تسک جدید
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateTask([FromBody] CreateTaskCommand command)

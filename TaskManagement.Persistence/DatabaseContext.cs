@@ -15,7 +15,7 @@ namespace TaskManagement.Persistence
         {
             base.OnModelCreating(builder);
 
-            // اگر تنظیمات Fluent API خاصی داری، این خط لازمه
+           
             builder.ApplyConfigurationsFromAssembly(GetType().Assembly);
         }
 
