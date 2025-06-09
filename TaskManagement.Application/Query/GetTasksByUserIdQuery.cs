@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 using TaskManagement.Domain;
 
-namespace TaskManagement.Application.Command
+namespace TaskManagement.Application.Query
 {
-    public class GetTasksByUserIdCommand : IRequest<List<TaskItem>>
+    public class GetTasksByUserIdQuery : IRequest<List<TaskItem>>
     {
         public Guid UserId { get; }
 
-        public GetTasksByUserIdCommand(Guid userId)
+        public GetTasksByUserIdQuery(Guid userId)
         {
             UserId = userId;
         }

@@ -1,8 +1,8 @@
 ﻿using MediatR;
 
-namespace TaskManagement.Application.Command
+namespace TaskManagement.Application.Query
 {
-    public class GetTasksByStatusCommand : IRequest<List<TaskDto>>
+    public class GetTasksByStatusQuery : IRequest<List<TaskDto>>
     {
         public Domain.TaskStatus Status { get; set; }
     }
@@ -12,6 +12,6 @@ namespace TaskManagement.Application.Command
         public Guid Id { get; set; }
         public string Title { get; set; } = "";
         public string Description { get; set; } = "";
-        public TaskManagement.Domain.TaskStatus Status { get; set; }
+        public Domain.TaskStatus Status { get; set; }
     }
 }
